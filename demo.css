@@ -1,0 +1,75 @@
+body {
+	background-color: #E8E8E8;
+}
+
+section {
+	margin: 16px;
+	display: inline-block;
+	background: white;
+	color: rgba(0, 0, 0, 0.87);
+	border-radius: 2px;
+	box-shadow: 0 1px 4px 0px rgba(0, 0, 0, 0.31);
+}
+
+section.expanded {
+	display: block;
+	max-width: 400px;
+}
+
+section header {
+	display: none;
+}
+
+section.expanded header {
+	display: block;
+}
+
+section p {
+	display: none;
+}
+
+section.expanded p {
+	display: block;
+}
+
+/*section button {
+	background: white;
+	padding: 8px 16px;
+	border: none;
+	outline: none;
+	text-transform: uppercase;
+	cursor: pointer;
+}*/
+
+#fab {
+	position: fixed;
+	right: 16px;
+	bottom: 16px;
+	display: block;
+	width: 56px;
+	height: 56px;
+	font-size: 24px;
+	line-height: 56px;
+	text-align: center;
+	border: none;
+	border-radius: 50%;
+	outline: none;
+
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	text-transform: none;
+	letter-spacing: normal;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+	-moz-osx-font-smoothing: grayscale;
+	font-feature-settings: 'liga';
+
+	background: #d23f31;
+	color: rgba(255, 255, 255, 0.87);
+	box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.54);
+	cursor: pointer;
+}
