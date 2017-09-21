@@ -23,7 +23,7 @@ Transition = {
 	},
 	// Translates from a source (snapshot) to a destination (element)
 	// for the duration specified (in milliseconds)
-	animate: function(element, snapshot, duration) {
+	from: function(element, snapshot, duration) {
 		// If the second argument was passed as an Element
 		if (snapshot instanceof Element) {
 			// Get the snapshot of that element
@@ -77,6 +77,52 @@ Transition = {
 		}, 18);
 		setTimeout(function() {
 			element.style.transition = transition;
+		}, duration);
+	},
+	// Dynamically executes a CSS animation that can have JS-calculated values
+	animate: function(element, keyframes, duration) {
+		var objToCSS = function(obj) {
+			var res = [];
+			for (var key in obj) {
+				res.push(key + ':' + obj[key] + ';');
+			}
+			return res.join('');
+		};
+		var keyframeCSS = [];
+		for (var k in keyframes) {
+			if (k === 'from' || k === 'to') {
+				keyframeCSS.push(k + ' {' + objToCSS(keyframes[k]) + '} ');
+			} else if (+k === +k) {
+				keyframeCSS.push(k + '% {' + objToCSS(keyframes[k]) + '} ');
+			} else { // Property
+				var frames = keyframes[k];
+				for (var frame in frames) {
+					if (frame === 'from' || frame === 'to') {
+						keyframeCSS.push(frame + ' {' +
+							k + ':' + frames[frame] + ';} ');
+					} else {
+						keyframeCSS.push(frame + '% {' +
+							k + ':' + frames[frame] + ';} ');
+					}
+				}
+			}
+		}
+		var style = document.createElement('style');
+		style.type = 'text/css';
+		var name = '___' + Math.floor(Math.random() * 1e16).toString(36);
+		var css = '@keyframes ' + name + ' { ' + keyframeCSS.join('') + '}';
+		style.innerHTML = css;
+		document.head.appendChild(style);
+		// Get the element's previous style.animation
+		var animation = element.style.animation;
+		// Start the animation
+		element.style.animation = name + ' ' + (duration * 0.001) + 's';
+		// After the duration of the animation
+		setTimeout(function() {
+			// Remove the style
+			document.head.removeChild(style);
+			// Reset the animation property
+			element.style.animation = animation;
 		}, duration);
 	}
 };

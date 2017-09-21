@@ -12,7 +12,7 @@ function toggle() {
 		button.textContent = 'Expand';
 	}
 	// Animate the change
-	Transition.animate(card, snapshot, 500);
+	Transition.from(card, snapshot, 500);
 }
 
 function fab() {
@@ -28,6 +28,6 @@ function fab() {
 		"<button onclick='toggle()'>Expand</button>"*/;
 	var fab = document.getElementById('fab');
 	document.body.insertBefore(section, fab);
-	Transition.animate(section,
+	Transition.from(section,
 		Transition.snapshot(fab, ['border-radius']), 1000);
 }
