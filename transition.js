@@ -43,11 +43,12 @@ Transition = {
 		res.width = rect.width;
 		res.height = rect.height;
 		// Return the snapshot
-		return res;
+		return new Transition.Snapshot(res);
 	},
 	// Translates from a source (snapshot) to a destination (element)
 	// for the duration specified (in milliseconds)
-	from: function(element, snapshot, duration) {
+	from: function(element, snapshot, duration, options) {
+		if (!options) options = {};
 		// If the second argument was passed as an Element
 		if (snapshot instanceof Element) {
 			// Get the snapshot of that element
@@ -89,7 +90,7 @@ Transition = {
 			var sec = duration * 0.001 + 's';
 			element.style.transition = ['transform'].concat(attributes
 				).map(function(prop) {
-					return prop + ' ' + sec;
+					return prop + ' ' + sec + ' ' + (options.timing || 'ease');
 				}).join(', ');
 			element.style.transform = transform;
 			if (attributes.length !== 0) {
@@ -99,12 +100,28 @@ Transition = {
 				}
 			}
 		}, 18);
+		// Create the object for chaining callbacks
+		let res = new this.Callbacks();
+		// After the transition is complete
 		setTimeout(function() {
+			// Reset the transition
 			element.style.transition = transition;
+			// Call any callbacks
+			res.done();
 		}, duration);
+		return res;
 	},
 	// Dynamically executes a CSS animation that can have JS-calculated values
-	animate: function(element, keyframes, duration) {
+	animate: function(element, keyframes, duration, options) {
+		if (!options) options = {};
+		// If there are multiple elements
+		if (element.length && (element.length !== 1 ||
+			element[0] !== element)) {
+			for (var i = element.length; i --; ) {
+				Transition.animate(element[i], keyframes, duration);
+			}
+			return;
+		}
 		var objToCSS = function(obj) {
 			var res = [];
 			for (var key in obj) {
@@ -140,13 +157,52 @@ Transition = {
 		// Get the element's previous style.animation
 		var animation = element.style.animation;
 		// Start the animation
-		element.style.animation = name + ' ' + (duration * 0.001) + 's';
+		element.style.animation = name + ' ' + (duration * 0.001) + 's ' +
+			(options.timing || 'ease');
+		// Create the object for chaining callbacks
+		let res = new this.Callbacks();
 		// After the duration of the animation
 		setTimeout(function() {
 			// Remove the style
 			document.head.removeChild(style);
 			// Reset the animation property
 			element.style.animation = animation;
+			// Call any callbacks
+			res.done();
 		}, duration);
+		return res;
 	}
 };
+
+Transition.Callbacks = function() {
+	this.callbacks = [];
+}
+
+Transition.Callbacks.prototype.then = function(c) {
+	this.callbacks.push(c);
+	return this;
+}
+
+Transition.Callbacks.prototype.done = function() {
+	for (let c of this.callbacks) {
+		c();
+	}
+}
+
+Transition.Snapshot = function(json) {
+	this.left = json.left;
+	this.top = json.top;
+	this.width = json.width;
+	this.height = json.height;
+	this.attributes = json.attributes;
+}
+
+Transition.Snapshot.prototype.left = 0;
+Transition.Snapshot.prototype.top = 0;
+Transition.Snapshot.prototype.width = 0;
+Transition.Snapshot.prototype.height = 0;
+
+Transition.Snapshot.prototype.setAttribute = function(name, value) {
+	if (this.attributes == null) this.attributes = {};
+	this.attributes[name] = value;
+}

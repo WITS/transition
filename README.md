@@ -1,6 +1,6 @@
 # What is transition.js?
 
-transition.js provides some static methods that make it easy to transtion and animate elements in web pages.
+transition.js provides some static methods that make it easy to transition and animate elements in web pages.
 
 # Usage
 
@@ -136,4 +136,30 @@ Once you've created your animation JSON, you can perform the animation like so:
 
 ```js
 Transition.animate(element, json, 500); // Where 500 represents the duration of the animation, in milliseconds
+```
+
+# Complex Usage
+
+In addition to the more simple usage above, transition.js supports the following on both the Transition.from and Transition.animate methods.
+
+## Alternative Timing Functions
+
+By default, all animations use the "ease" timing function. You can specify any CSS timing function though. To change the timing function, simply pass another parameter to the function you're calling, like so:
+
+```js
+Transition.animate(element, json, 500, { timing: 'linear' });
+```
+
+## Calling Code After Animation Ends (Promise-style)
+
+You can easily call code after an animation ends like so:
+
+```js
+Transition.from(element, snapshot, 500).then(() => { /* ... */ });
+```
+
+Or, if you're not using ES6
+
+```js
+Transition.from(element, snapshot, 500).then(function() { /* ... */ });
 ```
