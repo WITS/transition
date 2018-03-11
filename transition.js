@@ -65,8 +65,18 @@ Transition = {
 		/// Get the bounding rect for this element
 		var rect = element.getBoundingClientRect();
 		// Apply the new transform
-		var scale = ['scale(', snapshot.width / rect.width, ',',
-			snapshot.height / rect.height, ')'].join('');
+		var scaleW = snapshot.width / rect.width;
+		var scaleH = snapshot.height / rect.height;
+
+		if (options.aspectRatio === 'width') {
+			scaleH = scaleW;
+		} else if (options.aspectRatio === 'height') {
+			scaleW = scaleH;
+		} else if (options.aspectRatio === 'none') {
+			scaleW = scaleH = 1;
+		}
+
+		var scale = ['scale(', scaleW, ',', scaleH, ')'].join('');
 		element.style.transform = scale;
 		rect = element.getBoundingClientRect();
 		element.style.transform = [
@@ -90,7 +100,8 @@ Transition = {
 			var sec = duration * 0.001 + 's';
 			element.style.transition = ['transform'].concat(attributes
 				).map(function(prop) {
-					return prop + ' ' + sec + ' ' + (options.timing || 'ease');
+					return prop + ' ' + sec + ' ' + (options.timing || 'ease') + ' ' +
+					((options.delay || 0) * 0.001) + 's';
 				}).join(', ');
 			element.style.transform = transform;
 			if (attributes.length !== 0) {
@@ -101,14 +112,14 @@ Transition = {
 			}
 		}, 18);
 		// Create the object for chaining callbacks
-		let res = new this.Callbacks();
+		var res = new this.Callbacks();
 		// After the transition is complete
 		setTimeout(function() {
 			// Reset the transition
 			element.style.transition = transition;
 			// Call any callbacks
 			res.done();
-		}, duration);
+		}, duration + (options.delay || 0));
 		return res;
 	},
 	// Dynamically executes a CSS animation that can have JS-calculated values
@@ -158,9 +169,9 @@ Transition = {
 		var animation = element.style.animation;
 		// Start the animation
 		element.style.animation = name + ' ' + (duration * 0.001) + 's ' +
-			(options.timing || 'ease');
+			(options.timing || 'ease') + ' ' + ((options.delay || 0) * 0.001) + 's';
 		// Create the object for chaining callbacks
-		let res = new this.Callbacks();
+		var res = new this.Callbacks();
 		// After the duration of the animation
 		setTimeout(function() {
 			// Remove the style
@@ -169,7 +180,7 @@ Transition = {
 			element.style.animation = animation;
 			// Call any callbacks
 			res.done();
-		}, duration);
+		}, duration + (options.delay || 0));
 		return res;
 	}
 };
@@ -184,8 +195,8 @@ Transition.Callbacks.prototype.then = function(c) {
 }
 
 Transition.Callbacks.prototype.done = function() {
-	for (let c of this.callbacks) {
-		c();
+	for (var x = 0, y = this.callbacks.length; x < y; ++ x) {
+		this.callbacks[x]();
 	}
 }
 

@@ -142,12 +142,54 @@ Transition.animate(element, json, 500); // Where 500 represents the duration of 
 
 In addition to the more simple usage above, transition.js supports the following on both the Transition.from and Transition.animate methods.
 
-## Alternative Timing Functions
+## Options
+
+You can pass additional options as an object to either the `Transition.from` or `Transition.animate` methods. The properties that you can pass are listed below.
+
+### Alternative Timing Functions
 
 By default, all animations use the "ease" timing function. You can specify any CSS timing function though. To change the timing function, simply pass another parameter to the function you're calling, like so:
 
 ```js
 Transition.animate(element, json, 500, { timing: 'linear' });
+```
+
+### Delays
+
+By default, all animations start immediately. You can specify a CSS-style delay in milliseconds, like so:
+
+```js
+Transition.animate(element, json, 500, { delay: 500 }); // Delay the animtion by half a second
+```
+
+> Please note that delaying an animation will not cause the element to use its 0% / from styling while it's being delayed.
+
+### Aspect Ratio
+
+(`Transform.from` only.) By default, `Transform.from` attempts to animate the position and size of an element from a snapshot. This often works perfectly, but sometimes you may want to transition an element without using the snapshot's width, height, or size. In these cases you can set the `aspectRatio` option. This option has three accepted values:
+
+#### Width
+
+`'width'` causes the element to be scaled based only on the change in width between the snapshot and the element.
+
+```js
+Transition.from(element, snapshot, 500, { aspectRatio: 'width' });
+```
+
+#### Height
+
+`'height'` causes the element to be scaled based only on the change in height between the snapshot and the element.
+
+```js
+Transition.from(element, snapshot, 500, { aspectRatio: 'height' });
+```
+
+#### None
+
+`'none'` causes the element to ignore changes in scale. The element will still animate the change in position (based on the change in the top-left corner of the element and the snapshot).
+
+```js
+Transition.from(element, snapshot, 500, { aspectRatio: 'width' });
 ```
 
 ## Calling Code After Animation Ends (Promise-style)
