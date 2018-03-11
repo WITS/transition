@@ -140,11 +140,11 @@ Transition.animate(element, json, 500); // Where 500 represents the duration of 
 
 # Complex Usage
 
-In addition to the more simple usage above, transition.js supports the following on both the Transition.from and Transition.animate methods.
+In addition to the more simple usage above, transition.js supports the following on the `Transition.from` and/or `Transition.animate` methods.
 
 ## Options
 
-You can pass additional options as an object to either the `Transition.from` or `Transition.animate` methods. The properties that you can pass are listed below.
+You can pass additional options as an object. The properties that you can pass are listed below.
 
 ### Alternative Timing Functions
 
@@ -194,7 +194,7 @@ Transition.from(element, snapshot, 500, { aspectRatio: 'width' });
 
 ## Calling Code After Animation Ends (Promise-style)
 
-You can easily call code after an animation ends like so:
+You can easily call code after a transition or animation ends like so:
 
 ```js
 Transition.from(element, snapshot, 500).then(() => { /* ... */ });
