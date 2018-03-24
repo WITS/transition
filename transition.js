@@ -182,7 +182,126 @@ Transition = {
 			res.done();
 		}, duration + (options.delay || 0));
 		return res;
-	}
+	},
+	// Animates scrolling through an element or the window
+	scroll: function(end, duration, options) {
+		if (typeof end === 'object' && end !== window && !(end instanceof Element)) {
+			options = end;
+			end = null;
+		} else if (typeof duration === 'object') {
+			options = duration;
+			duration = null;
+		} else if (options == null) {
+			options = {};
+		}
+
+		// Get the current scroll position of the element
+		this.scrollElement = options.element || window;
+
+		// If end is already a number
+		if (typeof end === 'number') {
+			this.scrollEndY = end;
+		} else if (end instanceof Element) {
+			// Get the correct property of this element
+			this.scrollEndY = elem.getBoundingClientRect()[options.align || 'top'] +
+				this.scrollPosition(this.scrollElement);
+		} else {
+			// Get the scroll position from the window
+			if (options.align === 'bottom') {
+				this.scrollEndY = document.documentElement.scrollHeight;
+			} else {
+				this.scrollEndY = 0;
+			}
+		}
+
+		// Calculate the scroll distance
+		this.scrollDistance = this.scrollEndY -
+			this.scrollPosition(this.scrollElement);
+		if (this.scrollDistance > 0) {
+			if (this.scrollElement === window) {
+				this.scrollDistance -= window.innerHeight;
+			} else {
+				this.scrollDistance -= this.scrollElement.getBoundingClientRect().height;
+			}
+		}
+
+		// If the scroll distance is 0, stop here
+		if (this.scrollDistance === 0) {
+			return;
+		}
+
+		// If the duration is variable
+		if (options.per100) {
+			this.scrollDuration = Math.abs(options.per100 * this.scrollDistance * 0.01);
+		} else {
+			this.scrollDuration = duration || options.duration || 500;
+		}
+		
+		// Set other properties and begin scroll loop
+		this.scrollPrevT = Date.now();
+		this.isScrolling = true;
+		
+		this.requestFrame(this.scrollHelper);
+	},
+	// A simple polyfill for window.requestAnimationFrame that doesn't pollute the scope
+	requestFrame: function(callback) {
+		if (window.requestAnimationFrame) {
+			window.requestAnimationFrame(callback);
+		} else {
+			setTimeout(function() {
+				callback();
+			}, 16);
+		}
+	},
+	// A helper method to scroll in each animation frames
+	scrollHelper: function() {
+		var $this = Transition;
+		if ($this.isScrolling === false) {
+			return;
+		}
+		$this.requestFrame($this.scrollHelper);
+		
+		var now = Date.now();
+		var delta = now - $this.scrollPrevT;
+		$this.scrollPrevT = now;
+
+		if (delta != 0) {
+			var scrollY = $this.scrollPosition($this.scrollElement);
+			// var diff = $this.scrollEndY - scrollY;
+			var move = $this.scrollDistance * (delta / $this.scrollDuration);
+
+			$this.scrollTo(scrollY + move);
+
+			var newY = $this.scrollPosition($this.scrollElement);
+
+			if (scrollY === newY) {
+				$this.isScrolling = false;
+			}
+		}
+	},
+	// Gets the current scroll position of an element (or the window)
+	scrollPosition: function(elem) {
+		if (elem === window) {
+			return window.pageYOffset || document.documentElement.scrollTop;
+		} else {
+			return elem.scrollTop;
+		}
+	},
+	// Sets the current scroll position of an element (or the window)
+	scrollTo: function(y) {
+		if (this.scrollElement === window) {
+			window.scrollTo(0, y);
+		} else {
+			this.scrollElement.scrollTop = y;
+		}
+	},
+	// Scroll variables
+	isScrolling: false,
+	scrollEndY: 0,
+	scrollDistance: 0,
+	scrollElement: window,
+	scrollPrevT: 0,
+	scrollDuration: 500
 };
 
 Transition.Callbacks = function() {

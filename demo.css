@@ -12,6 +12,10 @@ section {
 	box-shadow: 0 1px 4px 0px rgba(0, 0, 0, 0.31);
 }
 
+body.scrolling section {
+	display: block;
+}
+
 section.expanded {
 	display: inline-block;
 	padding: 16px;
@@ -75,4 +79,15 @@ section.expanded p {
 	color: rgba(255, 255, 255, 0.87);
 	box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.54);
 	cursor: pointer;
+}
+
+#buttons {
+	position: fixed;
+	right: 16px;
+	bottom: 16px;
+	display: block;
+	padding: 16px;
+	background: rgba(255, 255, 255, 0.87);
+	box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.31);
+	border-radius: 2px;
 }
