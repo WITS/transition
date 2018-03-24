@@ -138,9 +138,37 @@ Once you've created your animation JSON, you can perform the animation like so:
 Transition.animate(element, json, 500); // Where 500 represents the duration of the animation, in milliseconds
 ```
 
+## Animate Scrolling
+
+You can animate a scroll to a position or an element easily using `Transition.scroll`.
+
+### Scroll To a Position
+
+You can scroll to a Y position like so:
+
+```js
+Transition.scroll(0, 500); // Transition.scroll(y, duration)
+```
+
+### Scroll to an Element
+
+You can scroll to the top of an element like so:
+
+```js
+Transition.scroll(element, 500); // Transition.scroll(element, duration)
+```
+
+#### Scroll to the bottom of an element
+
+You can scroll to the bottom of an element like so:
+
+```js
+Transition.scroll(element, 500, { align: 'bottom' });
+```
+
 # Complex Usage
 
-In addition to the more simple usage above, transition.js supports the following on the `Transition.from` and/or `Transition.animate` methods.
+In addition to the more simple usage above, transition.js supports the following on the `Transition.from`, `Transition.animate`, and/or `Transition.scroll` methods.
 
 ## Options
 
@@ -192,6 +220,22 @@ Transition.from(element, snapshot, 500, { aspectRatio: 'height' });
 Transition.from(element, snapshot, 500, { aspectRatio: 'width' });
 ```
 
+### Scroll Duration
+
+(`Transition.scroll` only.) If you don't want scrolling short distances to take as long as scrolling long distances (or vice versa), you can specify the duration per every 100 pixels scrolled, like so:
+
+```js
+Transition.scroll(0, { per100: 30 }); // Speed is 30 milliseconds per 100 pixels scrolled
+```
+
+### Scroll Element
+
+(`Transition.scroll` only.) If you want to scroll inside of an element (e.g. a wrapper element, with overflow: scroll), you can specify that, like so:
+
+```js
+Transition.scroll(0, 500, { element: wrapper }); // Instead of scrolling in the window, scroll in `wrapper`
+```
+
 ## Calling Code After Animation Ends (Promise-style)
 
 You can easily call code after a transition or animation ends like so:
@@ -200,7 +244,7 @@ You can easily call code after a transition or animation ends like so:
 Transition.from(element, snapshot, 500).then(() => { /* ... */ });
 ```
 
-Or, if you're not using ES6
+Alternatively, if you're not using ES6:
 
 ```js
 Transition.from(element, snapshot, 500).then(function() { /* ... */ });
