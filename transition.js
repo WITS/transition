@@ -203,12 +203,21 @@ Transition = {
 			this.scrollEndY = end;
 		} else if (end instanceof Element) {
 			// Get the correct property of this element
-			this.scrollEndY = elem.getBoundingClientRect()[options.align || 'top'] +
+			var rect = end.getBoundingClientRect();
+			this.scrollEndY = rect[options.align || 'top'] +
 				this.scrollPosition(this.scrollElement);
+			if (options.align === 'bottom') {
+				if (this.scrollElement === window) {
+					this.scrollEndY -= window.innerHeight;
+				} else {
+					this.scrollEndY -= this.scrollElement.getBoundingClientRect().height;
+				}
+			}
 		} else {
 			// Get the scroll position from the window
 			if (options.align === 'bottom') {
-				this.scrollEndY = document.documentElement.scrollHeight;
+				this.scrollEndY = document.documentElement.scrollHeight -
+					window.innerHeight;
 			} else {
 				this.scrollEndY = 0;
 			}
@@ -217,13 +226,6 @@ Transition = {
 		// Calculate the scroll distance
 		this.scrollDistance = this.scrollEndY -
 			this.scrollPosition(this.scrollElement);
-		if (this.scrollDistance > 0) {
-			if (this.scrollElement === window) {
-				this.scrollDistance -= window.innerHeight;
-			} else {
-				this.scrollDistance -= this.scrollElement.getBoundingClientRect().height;
-			}
-		}
 
 		// If the scroll distance is 0, stop here
 		if (this.scrollDistance === 0) {
@@ -238,6 +240,8 @@ Transition = {
 		}
 		
 		// Set other properties and begin scroll loop
+		this.scrollInitialY = this.scrollPosition(this.scrollElement);
+		this.scrollInitialT = Date.now();
 		this.scrollPrevT = Date.now();
 		this.isScrolling = true;
 		
@@ -268,13 +272,14 @@ Transition = {
 		if (delta != 0) {
 			var scrollY = $this.scrollPosition($this.scrollElement);
 			// var diff = $this.scrollEndY - scrollY;
-			var move = $this.scrollDistance * (delta / $this.scrollDuration);
+			var move = $this.scrollDistance * Math.min(($this.scrollPrevT - $this.scrollInitialT) /
+				$this.scrollDuration, 1);
 
-			$this.scrollTo(scrollY + move);
+			$this.scrollTo($this.scrollInitialY + move);
 
 			var newY = $this.scrollPosition($this.scrollElement);
 
-			if (scrollY === newY) {
+			if (scrollY === newY || $this.scrollPrevT - $this.scrollInitialT > $this.scrollDuration) {
 				$this.isScrolling = false;
 			}
 		}
